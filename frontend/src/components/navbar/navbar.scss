@@ -1,0 +1,26 @@
+@import '@/assets/styles/variables';
+
+.p-menubar {
+  @apply p-4 rounded-none;
+
+  background-color: $secondary-color !important;
+
+  &-start > span {
+    @apply text-white text-xl;
+    font-family: 'Manrope', sans-serif !important;
+  }
+
+  &-root-list {
+    @apply ml-0 lg:ml-4;
+  }
+
+  &-button {
+    @apply ml-2;
+  }
+}
+
+.p-menuitem-content, .p-menuitem {
+  background-color: $secondary-color !important;
+  border: none;
+  box-shadow: none;
+}

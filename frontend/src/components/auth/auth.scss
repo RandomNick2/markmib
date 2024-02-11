@@ -1,0 +1,12 @@
+@import '@/assets/styles/variables';
+
+
+.auth {
+  @apply p-5 mx-auto max-w-sm bg-secondary rounded-lg mt-20;
+
+  h1 {
+    @apply text-2xl font-bold mb-4 text-center;
+  }
+
+
+}

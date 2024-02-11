@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+@import './variables';
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+body,
+html {
+  font-family: 'Manrope', sans-serif !important;
+  background: $bg-color;
+  color: #ffffff;
+}
+
+.wrapper {
+  @apply flex flex-col;
+}
+
+.p-inputtext {
+  @apply p-2 border border-primary;
+  background: $input-bg;
+  color: #fff;
+}
+
+.p-button-primary {
+  @apply py-2.5 px-2 bg-primary;
+}
