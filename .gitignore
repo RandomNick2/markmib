@@ -1,4 +1,7 @@
 # Logs
+.fleet
+.ide
+.adminjs
 logs
 *.log
 npm-debug.log*
