@@ -1,9 +1,7 @@
 <template>
-  <div class="wrapper">
-    <NavbarBlock />
-    <div class="content">
-      <slot></slot>
-    </div>
+  <NavbarBlock />
+  <div class="content">
+    <slot></slot>
   </div>
   <FooterBlock />
 </template>

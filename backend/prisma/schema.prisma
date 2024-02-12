@@ -28,6 +28,7 @@ model User {
   groupId   Int?
   marks     Mark[]
   visits    Visit[]
+  avatarUrl String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

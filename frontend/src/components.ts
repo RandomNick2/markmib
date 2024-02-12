@@ -7,6 +7,10 @@ import Button from 'primevue/button'
 import Badge from 'primevue/badge'
 import Ripple from 'primevue/ripple'
 import Password from 'primevue/password'
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
+import SplitButton from 'primevue/splitbutton'
+import Avatar from 'primevue/avatar'
 
 
 import type { App } from 'vue'
@@ -21,4 +25,8 @@ export function registerComponentsPrimeVue(app: App) {
   app.component('Badge', Badge)
   app.directive('ripple', Ripple)
   app.component('Password', Password)
+  app.component('Toast', Toast)
+  app.use(ToastService)
+  app.component('SplitButton', SplitButton)
+  app.component('Avatar', Avatar)
 }

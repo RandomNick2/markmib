@@ -12,16 +12,41 @@ html {
   color: #ffffff;
 }
 
-.wrapper {
+#app {
   @apply flex flex-col;
+  min-height: 100vh;
+
+  .content {
+    flex: 1;
+  }
+}
+
+.wrapper {
+  @apply flex flex-col mx-auto sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-7xl 2xl:max-w-screen-xl;
 }
 
 .p-inputtext {
   @apply p-2 border border-primary;
   background: $input-bg;
   color: #fff;
+
+  &.p-invalid {
+    border: 1px solid $red-color
+  }
 }
 
 .p-button-primary {
   @apply py-2.5 px-2 bg-primary;
 }
+
+.p-tieredmenu {
+  @apply bg-blue shadow-secondary;
+  box-shadow: 0 4px 22px 0 rgba(0, 0, 0, 0.25);
+}
+
+.p-menuitem-content, .p-menuitem {
+  @apply rounded bg-blue;
+  border: none;
+  box-shadow: none;
+}
+

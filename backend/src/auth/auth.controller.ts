@@ -7,6 +7,8 @@ import {
   Post,
   ValidationPipe,
   Body,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
@@ -17,13 +19,14 @@ import { Public } from './public.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('check')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Request() req) {
-    return req.user;
+  async getCurrentUser(@Request() req) {
+    return await this.authService.me(req.user.username);
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe())
   @Public()
   async signIn(@Body() body: AuthLoginDto) {

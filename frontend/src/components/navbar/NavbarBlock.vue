@@ -1,10 +1,20 @@
+<script lang="ts" setup>
+import { UserRole } from '@/stores/user.store'
+</script>
+
 <template>
   <Menubar :model="items">
     <template #start>
       <span class=""> MarKmib </span>
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
-      <RouterLink v-ripple class="flex items-center" v-bind="props.action" :to="{ name: item.routeName }">
+      <RouterLink
+        v-ripple
+        class="flex items-center bg-secondary"
+        :to="{ name: item.routeName }"
+        v-if="!item.role || user.role === item.role || user.role === UserRole.ADMIN"
+        v-bind="props.action"
+      >
         <span :class="item.icon" />
         <span class="ml-2">{{ item.label }}</span>
         <Badge v-if="item.badge" :class="{ 'ml-auto': !root, 'ml-2': root }" :value="item.badge" />
@@ -23,13 +33,26 @@
       </RouterLink>
     </template>
     <template #end>
-      <RouterLink  :to="{ name: 'auth' }" v-if="!user.isLogged">
-        <Button label="Войти" severity="info"/>
+      <RouterLink :to="{ name: 'auth' }" v-if="!user.isLogged">
+        <Button label="Войти" severity="info" />
       </RouterLink>
 
       <div class="flex align-items-center gap-2" v-else>
-        <Button icon="pi pi-user" />
+        <SplitButton
+          @click="$router.push({ name: 'profile' })"
+          v-ripple
+          icon="pi pi-user"
+          :model="profileButton"
+          id="user_dropdown"
+          :label="user.username"
+        >
+        <template #default>
+          <Avatar :image="user.avatarUrl" shape="circle" />
+          <span class="p-button-label ml-2" data-pc-section="label">{{ user.firstName }}</span>
+        </template>
+      </SplitButton>
       </div>
+
     </template>
   </Menubar>
 </template>
@@ -37,7 +60,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useUserStore } from '@/stores/user.store'
-import type { UserState } from '@/stores/user.store'
+import type { UserStore } from '@/stores/user.store'
+import type { MenuItem } from 'primevue/menuitem'
+
+interface MenuItemCustom extends MenuItem {
+  role?: UserRole
+}
 
 export default defineComponent({
   data() {
@@ -46,18 +74,32 @@ export default defineComponent({
     return {
       items: [
         {
-          label: 'Home',
+          label: 'Главная',
           icon: 'pi pi-home',
           routeName: 'home'
+        },
+        {
+          label: 'Группы',
+          icon: 'pi pi-users',
+          routeName: 'groups',
+          role: UserRole.TEACHER
         }
       ],
-      user: userStore as UserState
+      profileButton: [
+        {
+          label: 'Выйти',
+          icon: 'pi pi-sign-out',
+          command: this.logout
+        }
+      ] as MenuItemCustom[],
+      user: userStore as UserStore
     }
   },
 
   methods: {
-    goto() {
-      console.log('goto')
+    logout() {
+      this.user.logout()
+      this.$router.push({ name: 'auth' })
     }
   }
 })

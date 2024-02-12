@@ -48,7 +48,7 @@ export class GroupService {
       },
     });
   }
-  
+
   async findOne(groupId: number) {
     return this.prisma.group.findFirst({
       where: { id: groupId },
@@ -61,9 +61,9 @@ export class GroupService {
           orderBy: {
             firstName: 'asc',
           },
-        }
-      }
-    })
+        },
+      },
+    });
   }
 
   async findOneWithVisits(groupId: number) {
@@ -81,8 +81,8 @@ export class GroupService {
               firstName: 'asc',
             },
             include: {
-              visits: true
-            }
+              visits: true,
+            },
           },
         },
       });
@@ -90,7 +90,7 @@ export class GroupService {
       throw new NotFoundException();
     }
   }
-  
+
   async findOneWithMarks(groupId: number) {
     try {
       return this.prisma.group.findFirst({
@@ -106,8 +106,8 @@ export class GroupService {
               firstName: 'asc',
             },
             include: {
-              marks: true
-            }
+              marks: true,
+            },
           },
         },
       });

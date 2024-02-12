@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { get_me } from '@/http/authApi'
+
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -11,10 +13,18 @@ interface User {
   email?: string
   name?: string
   role?: UserRole
+  firstName?: string
+  lastName?: string
+  avatarUrl?: string
 }
 
 export interface UserState extends User {
   isLogged: boolean
+}
+
+export interface UserStore extends UserState {
+  loadUser: (token?: string) => Promise<void>
+  logout: () => void
 }
 
 export const useUserStore = defineStore({
@@ -25,6 +35,9 @@ export const useUserStore = defineStore({
     email: undefined,
     name: undefined,
     role: undefined,
+    firstName: undefined,
+    lastName: undefined,
+    avatarUrl: undefined,
     isLogged: !!localStorage.getItem('token')
   }),
 
@@ -34,11 +47,29 @@ export const useUserStore = defineStore({
       this.email = user.email;
       this.name = user.name;
       this.role = user.role;
+      this.firstName = user.firstName;
+      this.lastName = user.lastName;
+      this.avatarUrl = user.avatarUrl;
       this.isLogged = true;
     },
     
-    async loadUser(): Promise<void> {
-      
+    async loadUser(token?: string): Promise<void> {
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+      if (!this.isLogged && !token) return;
+
+      try {
+        const user = await get_me();
+        this.setUser(user);
+      } catch (error) {
+        return
+      }
+    },
+
+    logout() {
+      localStorage.removeItem('token')
+      this.$reset()
     }
   }
 })
