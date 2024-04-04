@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+/migrations
+/migrations/**
+
 # Logs
 logs
 *.log
