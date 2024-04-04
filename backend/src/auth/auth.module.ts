@@ -1,17 +1,21 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { UserModule } from '../user/user.module';
-import { UserService } from '../user/user.service';
-import { PrismaService } from '../prisma.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { options } from './config/jwt.module';
-import { JwtStrategy } from './jwt.strategy';
+import { PrismaClient } from '@prisma/client';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { getJwtConfig } from './config/jwt.config';
+import { JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
-  imports: [UserModule, PassportModule, JwtModule.registerAsync(options())],
+  imports: [
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getJwtConfig,
+    }),
+  ],
   controllers: [AuthController],
-  providers: [AuthService, UserService, JwtStrategy, PrismaService],
+  providers: [AuthService, PrismaClient, JwtStrategy],
 })
 export class AuthModule {}

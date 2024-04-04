@@ -6,7 +6,8 @@
   background-color: $secondary-color !important;
 
   &-start > span {
-    @apply text-white text-xl;
+    @apply text-xl;
+    color: rgb(0, 15, 45, 0.7);
     font-family: 'Manrope', sans-serif !important;
   }
 
@@ -19,7 +20,7 @@
   }
 
   .p-menuitem {
-    @apply rounded-3xl;
+    @apply rounded-3xl bg-secondary;
     margin: 0 !important;
   }
 }

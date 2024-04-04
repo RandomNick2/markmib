@@ -1,6 +1,9 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,45 +20,71 @@ enum UserRole {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String   @unique
+  id        Int    @id @default(autoincrement())
+  username  String @unique
   password  String
   firstName String
   lastName  String
-  role      UserRole @default(STUDENT)
-  group     Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  groupId   Int?
-  marks     Mark[]
-  visits    Visit[]
-  avatarUrl String?
 
+  role            UserRole  @default(STUDENT)
+  teacherJournals Journal[] @relation("JournalsAsTeacher")
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+  Grade           Grade[]
+  Group           Group?    @relation(fields: [groupId], references: [id])
+  groupId         Int?
+}
+
+model Journal {
+  id        Int    @id @default(autoincrement())
+  name      String @unique
+  teacher   User?  @relation("JournalsAsTeacher", fields: [teacherId], references: [id])
+  teacherId Int?
+
+  group   Group @relation(fields: [groupId], references: [id])
+  groupId Int
+
+  grades    Grade[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
+  lessons   Lesson[]
+}
+
+enum LessonType {
+  DEFAULT
+  RO
+}
+
+model Lesson {
+  id        Int        @id @default(autoincrement())
+  type      LessonType @default(DEFAULT)
+  name      String
+  grades    Grade[]
+  journal   Journal    @relation(fields: [journalId], references: [id])
+  journalId Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+}
+
+model Grade {
+  id        Int      @id @default(autoincrement())
+  journalId Int
+  journal   Journal  @relation(fields: [journalId], references: [id])
+  student   User?    @relation(fields: [studentId], references: [id])
+  studentId Int?
+  value     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id])
+  lessonId  Int?
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  users     User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Mark {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  score     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Visit {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  visited   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  journals  Journal[]
+  students  User[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
 }

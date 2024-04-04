@@ -1,10 +1,19 @@
 @import '@/assets/styles/variables';
 
-
 .auth {
   @apply p-5 mx-auto max-w-sm bg-secondary rounded-lg mt-20;
 
   h1 {
     @apply text-2xl font-bold mb-4 text-center;
+  }
+
+  input {
+    @apply bg-primary text-black;
+    background-color: $input-bg;
+  }
+
+  button {
+    @apply text-white;
+    background-color: $blue-color;
   }
 }

@@ -3,5 +3,5 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 </script>
 
 <template>
-  <DefaultLayout> content </DefaultLayout>
+  <DefaultLayout>  </DefaultLayout>
 </template>

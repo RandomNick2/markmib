@@ -3,7 +3,7 @@
     <h1>Авторизация</h1>
 
     <div class="flex flex-col gap-2">
-      <label for="username">Имя пользователя или почта</label>
+      <label for="username">Имя пользователя</label>
       <InputText required id="username" v-model="username" :invalid="isInvalid" />
     </div>
 
@@ -24,6 +24,7 @@
       label="Войти"
       severity="primary"
       class="w-full mt-4"
+      v-ripple
       @click="auth"
       :disabled="isLoading"
     />
@@ -31,17 +32,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { useToast } from 'primevue/usetoast'
-import { auth } from '@/http/authApi'
-import { useUserStore } from '@/stores/user.store'
-import type { UserStore } from '@/stores/user.store'
-
+import UserApi from '@/api/users.api';
+import type { UserStore } from '@/stores/user.store';
+import { useUserStore } from '@/stores/user.store';
+import { useToast } from 'primevue/usetoast';
+import { defineComponent } from 'vue';
+import './auth.scss';
 
 export default defineComponent({
   data() {
-    const toast = useToast()
-    const userStore = useUserStore()
+    const toast = useToast();
+    const userStore = useUserStore();
 
     return {
       toast: toast,
@@ -50,7 +51,7 @@ export default defineComponent({
       password: '',
       isLoading: false,
       isInvalid: false
-    }
+    };
   },
 
   methods: {
@@ -60,43 +61,36 @@ export default defineComponent({
         summary: 'Ошибка',
         detail: 'Не верный логин или пароль',
         life: 3000
-      })
+      });
     },
 
     async auth() {
-      this.isLoading = true
+      this.isLoading = true;
       if (this.username.trim() === '' || this.password.trim() === '') {
-        this.isInvalid = true
-        this.isLoading = false
-        this.show_error()
-        return
+        this.isInvalid = true;
+        this.show_error();
+        return;
       }
 
       try {
-        const { data } = await auth(this.username, this.password)
+        const { data } = await UserApi.login(this.username, this.password);
 
-        if (data.access_token) {
-          await this.user.loadUser(data.access_token)
+        if (data.accessToken) {
+          await this.user.loadUser(data.accessToken);
           this.toast.add({
             severity: 'success',
             summary: 'Успешно',
             detail: 'Вы успешно авторизовались',
             life: 3000
-          })
-          this.$router.push('/')
+          });
+          this.$router.push('/');
         }
       } catch (e) {
-        this.show_error()
-        return
+        this.show_error();
       }
 
-      this.isLoading = false
+      this.isLoading = false;
     }
-
   }
-})
+});
 </script>
-
-<style lang="scss">
-@import './auth.scss';
-</style>

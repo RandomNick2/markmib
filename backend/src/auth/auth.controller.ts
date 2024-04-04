@@ -1,35 +1,41 @@
 import {
+  Body,
   Controller,
   Get,
-  UseGuards,
-  Request,
-  UsePipes,
-  Post,
-  ValidationPipe,
-  Body,
-  HttpStatus,
   HttpCode,
+  Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { AuthService } from './auth.service';
-import { AuthLoginDto } from './dto/auth-login.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { Public } from './public.guard';
+import { Public } from './decorators/is-public';
+import { UserReq } from './decorators/user';
+import { LoginUserDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  async getCurrentUser(@Request() req) {
-    return await this.authService.me(req.user.username);
+  @Public()
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post('login')
+  async login(@Body() dto: LoginUserDto) {
+    return this.authService.signIn(dto);
   }
 
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @UsePipes(new ValidationPipe())
   @Public()
-  async signIn(@Body() body: AuthLoginDto) {
-    return await this.authService.login(body.username, body.password);
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post('register')
+  async register(@Body() dto: RegisterUserDto) {
+    return this.authService.register(dto);
+  }
+
+  @Get('me')
+  async me(@UserReq() user: User) {
+    return this.authService.returnUserFields(user);
   }
 }

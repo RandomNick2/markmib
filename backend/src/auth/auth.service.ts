@@ -1,44 +1,76 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { compare } from 'bcrypt';
-import { User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
+import { compare, genSalt, hash } from 'bcrypt';
+import { LoginUserDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private prismaService: PrismaClient,
   ) {}
 
-  async login(username: string, password: string) {
-    const user: User = await this.userService.findByUsername(username);
-
-    if (!user) throw new UnauthorizedException();
-    const isPasswordMatching: boolean = await compare(password, user.password);
-    if (!isPasswordMatching) throw new UnauthorizedException();
-
-    const payload = {
-      sub: user.id,
-      username: user.username,
-    };
-
+  async signIn(dto: LoginUserDto) {
+    const user = await this.validateUser(dto.username, dto.password);
     return {
-      access_token: await this.jwtService.signAsync(payload, {
-        secret: await this.configService.get('JWT_AUTH_SECRET'),
-      }),
+      accessToken: await this.issueTokenPair(user),
     };
   }
 
-  async me(username: string): Promise<any> {
-    try {
-      const { password, ...user } =
-        await this.userService.findByUsername(username);
-      return user;
-    } catch (e) {
-      throw new UnauthorizedException();
-    }
+  async register(dto: RegisterUserDto) {
+    const oldUser = await this.prismaService.user.findUnique({
+      where: {
+        username: dto.username,
+      },
+    });
+
+    if (oldUser) throw new UnauthorizedException('Логин занят');
+
+    const salt = await genSalt(10);
+    const newUser = await this.prismaService.user.create({
+      data: {
+        username: dto.username,
+        password: await hash(dto.password, salt),
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+      },
+    });
+
+    return {
+      accessToken: await this.issueTokenPair(newUser),
+      user: this.returnUserFields(newUser),
+    };
+  }
+
+  async validateUser(username: string, password: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { username: username },
+    });
+    if (!user) throw new UnauthorizedException('Неверный пароль или логин');
+    const isPasswordValid = await compare(password, user.password);
+    if (!isPasswordValid)
+      throw new UnauthorizedException('Неверный пароль или логин');
+    return user;
+  }
+
+  async issueTokenPair(user: User) {
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      password: user.password,
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return accessToken;
+  }
+
+  async returnUserFields(user: User) {
+    return {
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
   }
 }

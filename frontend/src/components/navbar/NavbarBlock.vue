@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { UserRole } from '@/stores/user.store'
+import { UserRole } from '@/types/user';
+import './navbar.scss';
 </script>
 
 <template>
   <Menubar :model="items">
     <template #start>
-      <span class=""> MarKmib </span>
+      <RouterLink class="font-bold" :to="{ name: 'home' }"> MarKmib </RouterLink>
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
       <RouterLink
@@ -39,72 +40,72 @@ import { UserRole } from '@/stores/user.store'
 
       <div class="flex align-items-center gap-2" v-else>
         <SplitButton
-          @click="$router.push({ name: 'profile' })"
           v-ripple
           icon="pi pi-user"
           :model="profileButton"
           id="user_dropdown"
           :label="user.username"
         >
-        <template #default>
-          <Avatar :image="user.avatarUrl" shape="circle" />
-          <span class="p-button-label ml-2" data-pc-section="label">{{ user.firstName }}</span>
-        </template>
-      </SplitButton>
+          <template #default>
+            <span class="p-button-label ml-2" data-pc-section="label">{{ user.firstName }}</span>
+          </template>
+        </SplitButton>
       </div>
-
     </template>
   </Menubar>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { useUserStore } from '@/stores/user.store'
-import type { UserStore } from '@/stores/user.store'
-import type { MenuItem } from 'primevue/menuitem'
+import type { UserStore } from '@/stores/user.store';
+import { useUserStore } from '@/stores/user.store';
+import { PrimeIcons } from 'primevue/api';
+import type { MenuItem } from 'primevue/menuitem';
+import { defineComponent } from 'vue';
 
 interface MenuItemCustom extends MenuItem {
-  role?: UserRole
+  role?: UserRole;
 }
 
 export default defineComponent({
   data() {
-    const userStore = useUserStore()
+    const userStore = useUserStore();
 
     return {
       items: [
         {
-          label: 'Главная',
-          icon: 'pi pi-home',
-          routeName: 'home'
+          label: 'Журналы',
+          icon: PrimeIcons.BOOK,
+          routeName: 'journals'
         },
         {
           label: 'Группы',
-          icon: 'pi pi-users',
+          icon: PrimeIcons.USERS,
           routeName: 'groups',
-          role: UserRole.TEACHER
+          role: UserRole.ADMIN
+        },
+        {
+          label: 'Пользователи',
+          icon: PrimeIcons.USERS,
+          routeName: 'users',
+          role: UserRole.ADMIN
         }
       ],
       profileButton: [
         {
           label: 'Выйти',
-          icon: 'pi pi-sign-out',
+          icon: PrimeIcons.SIGN_OUT,
           command: this.logout
         }
       ] as MenuItemCustom[],
       user: userStore as UserStore
-    }
+    };
   },
 
   methods: {
     logout() {
-      this.user.logout()
-      this.$router.push({ name: 'auth' })
+      this.user.logout();
+      this.$router.push({ name: 'auth' });
     }
   }
-})
+});
 </script>
-
-<style lang="scss">
-@import './navbar';
-</style>

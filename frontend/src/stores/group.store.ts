@@ -1,31 +1,35 @@
-import { defineStore } from "pinia";
-import { getGroups } from "@/http/groupApi";
+import GroupApi from '@/api/groups.api';
+import type { Group } from '@/types/group';
+import { defineStore } from 'pinia';
 
-
-export interface Group {
-  id: number,
-  name: string,
-  users?: null
-}
+export type Nullable<T> = T | null;
 
 export interface GroupState {
-  groups: Group[]
-}
-
-export interface GroupStore extends GroupState {
-  getAllGroups: () => Promise<void>
+  groups: Group[];
+  group?: Nullable<Group>;
 }
 
 export const useGroupStore = defineStore({
-  id: 'group',
+  id: 'groups',
 
   state: (): GroupState => ({
+    group: null,
     groups: []
   }),
 
   actions: {
-    async getAllGroups() {
-      this.groups = await getGroups()
+    async findAll() {
+      this.groups = await GroupApi.findAll();
+    },
+
+    async findOne(id: number) {
+      this.group = await GroupApi.findOne(id);
+    },
+
+    async create(name: string) {
+      const group = await GroupApi.create(name);
+      this.groups.push(group);
+      return group;
     }
   }
-})
+});

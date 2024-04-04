@@ -1,75 +1,64 @@
-import { defineStore } from 'pinia'
-import { get_me } from '@/http/authApi'
-
-
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  TEACHER = 'TEACHER',
-  STUDENT = 'STUDENT'
-}
-
-interface User {
-  username?: string
-  email?: string
-  name?: string
-  role?: UserRole
-  firstName?: string
-  lastName?: string
-  avatarUrl?: string
-}
+import UserApi from '@/api/users.api';
+import type { User, UserRole } from '@/types/user';
+import { defineStore } from 'pinia';
 
 export interface UserState extends User {
-  isLogged: boolean
+  isLogged: boolean;
+  users: User[];
 }
 
 export interface UserStore extends UserState {
-  loadUser: (token?: string) => Promise<void>
-  logout: () => void
+  loadUser: (token?: string) => Promise<void>;
+  logout: () => void;
 }
 
 export const useUserStore = defineStore({
   id: 'user',
 
   state: (): UserState => ({
-    username: undefined,
-    email: undefined,
-    name: undefined,
-    role: undefined,
-    firstName: undefined,
-    lastName: undefined,
-    avatarUrl: undefined,
-    isLogged: !!localStorage.getItem('token')
+    isLogged: !!localStorage.getItem('token'),
+    users: []
   }),
 
   actions: {
     setUser(user: User) {
       this.username = user.username;
-      this.email = user.email;
-      this.name = user.name;
       this.role = user.role;
       this.firstName = user.firstName;
       this.lastName = user.lastName;
-      this.avatarUrl = user.avatarUrl;
       this.isLogged = true;
     },
-    
+
     async loadUser(token?: string): Promise<void> {
       if (token) {
         localStorage.setItem('token', token);
       }
-      if (!this.isLogged && !token) return;
+      if (!token && !this.isLogged) return;
 
       try {
-        const user = await get_me();
+        const user = await UserApi.get_me();
         this.setUser(user);
       } catch (error) {
-        return
+        localStorage.removeItem('token');
+        this.isLogged = false;
+        return;
       }
     },
 
     logout() {
-      localStorage.removeItem('token')
-      this.$reset()
+      localStorage.removeItem('token');
+      this.$reset();
+    },
+
+    async create(data: User) {
+      const response = await UserApi.create(data);
+      this.users.push(response);
+      return response;
+    },
+
+    async findAll(role?: UserRole) {
+      const response = await UserApi.findAll(role);
+      this.users = response;
     }
   }
-})
+});

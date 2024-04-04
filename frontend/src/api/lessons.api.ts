@@ -1,0 +1,22 @@
+import type { Lesson, LessonType } from '@/types/lesson';
+import { $authHost } from '.';
+
+export default class LessonApi {
+  static async create(journalId: number, type?: LessonType, name?: string): Promise<Lesson> {
+    const response = await $authHost.post('/lessons', {
+      type: type,
+      journalId: journalId,
+      name: name
+    });
+    return response.data;
+  }
+
+  static async update(journalId: number, type: LessonType, name: string) {
+    const response = await $authHost.patch('/lessons/' + journalId, {
+      type: type,
+      name: name
+    });
+
+    return response.data;
+  }
+}

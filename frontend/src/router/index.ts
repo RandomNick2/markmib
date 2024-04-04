@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import { useUserStore } from '@/stores/user.store'
-import { UserRole } from '@/stores/user.store'
+import { useUserStore } from '@/stores/user.store';
+import { UserRole } from '@/types/user';
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,6 +10,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      // redirect: '/journals',
       meta: { auth: false }
     },
     {
@@ -25,47 +26,56 @@ const router = createRouter({
       meta: { auth: true }
     },
     {
+      path: '/journals',
+      name: 'journals',
+      component: () => import('../views/JournalsView.vue'),
+      meta: { auth: true }
+    },
+    {
+      path: '/journal/:id',
+      name: 'journal',
+      component: () => import('../views/JournalView.vue'),
+      meta: { auth: true }
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: () => import('../views/admin/UsersView.vue'),
+      meta: { auth: true, role: UserRole.ADMIN }
+    },
+    {
       path: '/groups',
       name: 'groups',
-      component: () => import('../views/GroupsView.vue'),
-      meta: { auth: true, role: UserRole.TEACHER }
+      component: () => import('../views/admin/GroupsView.vue'),
+      meta: { auth: true, role: UserRole.ADMIN }
     },
     {
       path: '/group/:id',
       name: 'group',
-      component: () => import('../views/GroupView.vue'),
-      meta: { auth: true, role: UserRole.TEACHER }
+      component: () => import('../views/admin/GroupView.vue'),
+      meta: { auth: true, role: UserRole.ADMIN }
     }
   ]
-})
+});
 
 router.beforeEach((to, from, next) => {
-  const user = useUserStore()
-
-  //  Проверка на роль
+  const user = useUserStore();
   user.loadUser().then(function () {
-    const requireRole = to.meta.role
+    //  Проверка на роль
+    const requireRole = to.meta.role;
 
-    if (user.role === UserRole.ADMIN) {
-      return next()
-    }
+    if (requireRole && user.role == UserRole.ADMIN) return next();
 
     if (requireRole && user.role !== requireRole) {
-      return next('/')
+      return next('/');
     }
 
     //  Проверка на авторизацию
-    const requireAuth = to.matched.some((record) => record.meta.auth)
-    if (to.name === 'auth' && user.isLogged) {
-      return next('/')
-    }
+    const requireAuth = to.matched.some((record) => record.meta.auth);
+    if (requireAuth && !user.isLogged) return next('/auth');
 
-    if (requireAuth && !user.isLogged) {
-      return next('/auth')
-    } else {
-      return next()
-    }
-  })
-})
+    return next();
+  });
+});
 
-export default router
+export default router;

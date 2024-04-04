@@ -5,11 +5,16 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body,
 html {
   font-family: 'Manrope', sans-serif !important;
   background: $bg-color;
-  color: #ffffff;
+  color: #000f2d;
+  overflow-x: hidden;
 }
 
 #app {
@@ -22,17 +27,35 @@ html {
 }
 
 .wrapper {
-  @apply flex flex-col mx-auto sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-7xl 2xl:max-w-screen-xl;
+  @apply flex flex-col px-5 mx-auto sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-7xl 2xl:max-w-screen-xl relative;
 }
 
-.p-inputtext {
-  @apply p-2 border border-primary;
+.p-inputtext.p-component {
+  @apply rounded-lg p-2;
   background: $input-bg;
-  color: #fff;
+  border: $input-border;
+  color: #0c1a36;
 
   &.p-invalid {
-    border: 1px solid $red-color
+    border: 1px solid $red-color;
   }
+}
+
+.p-inputwrapper {
+  @apply rounded-lg;
+  background: $input-bg;
+  border: $input-border;
+  color: #0c1a36;
+
+  &.p-invalid {
+    border: 1px solid $red-color;
+  }
+}
+
+.p-multiselect {
+  background: $input-bg;
+  border: $input-border;
+  color: #0c1a36;
 }
 
 .p-button-primary {
@@ -40,13 +63,89 @@ html {
 }
 
 .p-tieredmenu {
-  @apply bg-blue shadow-secondary;
+  @apply bg-primary shadow-secondary;
   box-shadow: 0 4px 22px 0 rgba(0, 0, 0, 0.25);
 }
 
-.p-menuitem-content, .p-menuitem {
-  @apply rounded bg-blue;
+.p-menuitem-content,
+.p-menuitem {
+  @apply rounded bg-primary;
   border: none;
   box-shadow: none;
 }
 
+.p-button-blue {
+  background-color: $blue-color;
+  color: $secondary-color;
+}
+
+.p-multiselect-panel {
+  box-shadow: 0 4px 35px 0 rgba(0, 0, 0, 0.2);
+}
+
+.table-wrapper {
+  @apply relative border-collapse h-96 rounded-xl;
+  background-color: $secondary-color;
+  overflow-x: auto;
+  max-width: 100%;
+
+  table {
+    @apply text-left rounded-xl;
+    background-color: $secondary-color;
+    width: max-content;
+    min-width: 100%;
+    border-spacing: 0;
+
+    thead {
+      border-bottom: 1px solid #ebeef6;
+    }
+
+    th,
+    td {
+      @apply h-10;
+
+      &:not(:last-child) {
+        border-right: 1px solid #ebeef6;
+      }
+
+      &:first-child {
+        border-right: 1px solid #ebeef6;
+      }
+
+      &:first-child {
+        @apply text-center;
+      }
+    }
+
+    td {
+      @apply h-14;
+    }
+
+    tr {
+      width: min-content;
+      background-color: $primary-color;
+      border-bottom: 1px solid #ebeef6;
+
+      &:hover,
+      &:focus {
+        background-color: #a4a5a578;
+      }
+    }
+
+    input {
+      @apply h-full bg-transparent outline-none text-center w-full;
+
+      &:focus {
+        background-color: #6d7ab838;
+      }
+    }
+  }
+}
+
+.p-datepicker {
+  @apply bg-secondary;
+}
+
+.pi {
+  @apply text-black;
+}
