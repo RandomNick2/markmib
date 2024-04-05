@@ -4,6 +4,7 @@ import {
   Param,
   Patch,
   Post,
+  Delete,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,7 +23,7 @@ export class LessonsController {
   @Roles(UserRole.TEACHER)
   @UsePipes(new ValidationPipe())
   async create(@Body() dto: CreateLessonDto) {
-    return this.lessonsService.create(dto);
+    return await this.lessonsService.create(dto);
   }
 
   @Patch(':id')
@@ -33,6 +34,12 @@ export class LessonsController {
     @Param('id') id: string,
     @Body() dto: UpdateLessonDto,
   ) {
-    return this.lessonsService.update(user, dto, +id);
+    return await this.lessonsService.update(user, dto, +id);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.TEACHER)
+  async delete(@Param('id') id: string) {
+    return await this.lessonsService.delete(+id);
   }
 }

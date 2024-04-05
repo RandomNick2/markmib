@@ -1,7 +1,7 @@
 import { useUserStore } from '@/stores/user.store';
 import { UserRole } from '@/types/user';
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
+// import HomeView from '../views/HomeView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,9 +9,9 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
-      // redirect: '/journals',
-      meta: { auth: false }
+      // component: HomeView,
+      redirect: '/journals'
+      // meta: { auth: false }
     },
     {
       path: '/auth',
@@ -19,12 +19,12 @@ const router = createRouter({
       component: () => import('../views/AuthView.vue'),
       meta: { auth: false }
     },
-    {
-      path: '/profile',
-      name: 'profile',
-      component: () => import('../views/ProfileView.vue'),
-      meta: { auth: true }
-    },
+    // {
+    // path: '/profile',
+    // name: 'profile',
+    // component: () => import('../views/ProfileView.vue'),
+    // meta: { auth: true }
+    // },
     {
       path: '/journals',
       name: 'journals',
@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
     if (requireRole && user.role == UserRole.ADMIN) return next();
 
     if (requireRole && user.role !== requireRole) {
-      return next('/');
+      return next('/journals');
     }
 
     //  Проверка на авторизацию

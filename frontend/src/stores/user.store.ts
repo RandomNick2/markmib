@@ -1,6 +1,6 @@
-import UserApi from '@/api/users.api';
-import type { User, UserRole } from '@/types/user';
-import { defineStore } from 'pinia';
+import UserApi from '@/api/users.api'
+import type { User, UserRole } from '@/types/user'
+import { defineStore } from 'pinia'
 
 export interface UserState extends User {
   isLogged: boolean;
@@ -59,6 +59,13 @@ export const useUserStore = defineStore({
     async findAll(role?: UserRole) {
       const response = await UserApi.findAll(role);
       this.users = response;
+    },
+
+    async deleteUser(userId: number) {
+      await UserApi.delete(userId);
+      this.users = this.users.filter(({ id }) => {
+        return id != userId
+      })
     }
   }
 });

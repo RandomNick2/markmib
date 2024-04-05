@@ -1,8 +1,8 @@
-import GradeApi from '@/api/grades.api'
+import GradeApi from '@/api/grades.api';
 import JournalsApi from '@/api/journals.api';
-import LessonApi from '@/api/lessons.api'
+import LessonApi from '@/api/lessons.api';
 import type { Journal } from '@/types/journal';
-import { LessonType } from '@/types/lesson'
+import { LessonType } from '@/types/lesson';
 import { defineStore } from 'pinia';
 
 export type Nullable<T> = T | null;
@@ -37,16 +37,48 @@ export const useJournalStore = defineStore({
 
     async createLesson(journalId: number, type?: LessonType, name?: string) {
       const lesson = await LessonApi.create(journalId, type, name);
-      if (!this.journal?.lessons) return
+      if (!this.journal?.lessons) return;
       this.journal?.lessons.push(lesson);
     },
 
-    async createOrUpdateGrade(journalId: number, studentId: number, lessonId: number, value: string) {
-      await GradeApi.updateOrCreate(journalId, studentId, lessonId, value)
+    async createOrUpdateGrade(
+      journalId: number,
+      studentId: number,
+      lessonId: number,
+      value: string
+    ) {
+      const response = await GradeApi.updateOrCreate(journalId, studentId, lessonId, value);
+      this.journal?.lessons?.map((lesson) => {
+        if (!response.created && lesson.id === response.grade.lessonId) {
+          lesson.grades.map((grade) => {
+            console.log(grade.id, response.grade.id);
+            if (grade.id == response.grade.id) {
+              grade.value = response.grade.value;
+              return;
+            }
+          });
+        }
+        lesson.grades.push(response.grade);
+      });
     },
 
     async updateLessonName(lessonId: number, name: string) {
-      await LessonApi.update(lessonId, LessonType.DEFAULT, name)
+      const updatedLesson = await LessonApi.update(lessonId, LessonType.DEFAULT, name);
+      this.journal?.lessons?.map((lesson) => {
+        if (lesson.id === lessonId) {
+          lesson.name = updatedLesson.name;
+        }
+      });
+    },
+
+    async deleteLesson(lessonId: number) {
+      await LessonApi.delete(lessonId);
+      if (this.journal?.lessons != undefined) {
+        this.journal.lessons = this.journal?.lessons?.filter(({ id }) => {
+          return id != lessonId
+        })
+      };
+
     }
   }
 });

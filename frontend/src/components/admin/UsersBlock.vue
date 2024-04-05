@@ -2,6 +2,8 @@
   <div class="wrapper mt-9">
     <h1 class="font-bold text-xl">Пользователи</h1>
     <div class="table-wrapper mt-4">
+      <ContextMenu ref="userMenu" :model="userMenuItems" />
+
       <table class="w-full">
         <thead>
           <th>ID</th>
@@ -19,7 +21,11 @@
         </thead>
 
         <tbody>
-          <tr v-for="user in userStore.users" :key="user.id">
+          <tr
+            v-for="user in userStore.users"
+            :key="user.id"
+            @contextmenu="onUserRightClick($event, user.id)"
+          >
             <td>{{ user.id }}</td>
             <td class="text-center">{{ user.firstName }} {{ user.lastName }}</td>
             <td class="text-center">{{ user.role }}</td>
@@ -119,15 +125,40 @@ const userData = ref({
   role: undefined
 });
 
+const userMenu = ref();
+const userMenuItems = ref([
+  {
+    label: 'Удалить',
+    icon: PrimeIcons.TRASH,
+    command: async () => {
+      await userStore.deleteUser(selectedUser.value);
+      toast.add({
+        severity: 'success',
+        life: 3000,
+        summary: 'Успешно!',
+        detail: 'Урок удалён'
+      });
+    }
+  }
+]);
+const selectedUser = ref();
+
 onMounted(async () => {
   await userStore.findAll();
 });
 
 const userRolesArray: UserRole[] = Object.values(UserRole);
 
+const onUserRightClick = (event: Event, lessonId: number) => {
+  selectedUser.value = lessonId;
+  userMenu.value.show(event);
+};
+
 async function createUser() {
   isLoading.value = true;
   try {
+    // eslint-ignore
+    // @ts-ignore
     await userStore.create(userData.value);
     toast.add({
       life: 3000,

@@ -14,7 +14,7 @@ export class GradesService {
       },
     });
     if (oldGrade) {
-      return this.prismaService.grade.update({
+      const grade = await this.prismaService.grade.update({
         where: {
           id: oldGrade.id,
         },
@@ -22,9 +22,10 @@ export class GradesService {
           value: dto.value,
         },
       });
+      return { created: false, grade: grade };
     }
 
-    return this.prismaService.grade.create({
+    const grade = await this.prismaService.grade.create({
       data: {
         journalId: dto.journalId,
         studentId: dto.studentId,
@@ -32,5 +33,7 @@ export class GradesService {
         value: dto.value,
       },
     });
+
+    return { created: true, grade: grade };
   }
 }

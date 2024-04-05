@@ -31,4 +31,9 @@ export default class UserApi {
     });
     return response.data;
   }
+
+  static async delete(id: number) {
+    const response = await $authHost.delete('/users/' + id);
+    return response.data
+  }
 }

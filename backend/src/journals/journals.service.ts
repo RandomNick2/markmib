@@ -8,7 +8,7 @@ export class JournalsService {
 
   async findOne(user: User, id: number) {
     try {
-      return this.prismaService.journal.findUniqueOrThrow({
+      return await this.prismaService.journal.findUniqueOrThrow({
         where: {
           id: id,
           teacherId: user.role == UserRole.TEACHER ? user.id : undefined,
@@ -19,7 +19,18 @@ export class JournalsService {
           lessons: {
             select: {
               id: true,
-              grades: true,
+              grades: {
+                select: {
+                  id: true,
+                  value: true,
+                  journalId: true,
+                  lessonId: true,
+                  studentId: true,
+                },
+                orderBy: {
+                  id: 'asc',
+                },
+              },
               name: true,
             },
           },
@@ -61,7 +72,7 @@ export class JournalsService {
         break;
     }
 
-    return this.prismaService.journal.findMany({
+    return await this.prismaService.journal.findMany({
       where: where,
       select: {
         id: true,
@@ -81,7 +92,7 @@ export class JournalsService {
   }
 
   async create(dto: CreateJournalDto) {
-    return this.prismaService.journal.create({
+    return await this.prismaService.journal.create({
       data: dto,
       select: {
         id: true,

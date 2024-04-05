@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -19,18 +20,18 @@ export class JournalsController {
 
   @Get()
   async findAll(@UserReq() user: User) {
-    return this.journalsService.findAll(user);
+    return await this.journalsService.findAll(user);
   }
 
   @Get(':id')
   async findOne(@UserReq() user: User, @Param('id') id: string) {
-    return this.journalsService.findOne(user, +id);
+    return await this.journalsService.findOne(user, +id);
   }
 
   @Post()
   @UsePipes(new ValidationPipe())
   @Roles(UserRole.ADMIN)
   async create(@Body() dto: CreateJournalDto) {
-    return this.journalsService.create(dto);
+    return await this.journalsService.create(dto);
   }
 }

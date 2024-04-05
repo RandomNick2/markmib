@@ -5,13 +5,15 @@
       Не забудьте нажать ENTER после того как что то изменили
     </h2>
     <div class="table-wrapper mt-4">
+      <ContextMenu ref="lessonMenu" :model="lessonMenuItems" />
       <table class="w-full">
         <thead>
-          <th v-if="userStore.role != UserRole.STUDENT">Студент</th>
+          <th class="max-w-10" v-if="userStore.role != UserRole.STUDENT">Студент</th>
           <th
             v-for="lesson in journalStore.journal?.lessons"
             class="max-w-40 inline-block"
             :key="lesson.id"
+            @contextmenu="onLessonRightClick($event, lesson.id)"
           >
             <input
               type="text"
@@ -20,7 +22,7 @@
               @change="updateLessonName(lesson.id, $event)"
             />
           </th>
-          <th class="text-right w-0 pl-0" v-if="userStore.role != UserRole.STUDENT">
+          <th class="text-right max-w-20 pl-0" v-if="userStore.role != UserRole.STUDENT">
             <Button
               class="text-white"
               :icon="PrimeIcons.PLUS"
@@ -43,6 +45,7 @@
                 :value="getGrade(student?.id, lesson)"
                 @change="updateOrCreateGrade(student.id, lesson.id, $event)"
                 v-if="student.id"
+                maxlength="3"
               />
             </td>
             <td></td>
@@ -81,7 +84,30 @@ const journalStore = useJournalStore();
 const userStore = useUserStore();
 const route = useRoute();
 const toast = useToast();
+
 const student = ref();
+const lessonMenu = ref();
+const lessonMenuItems = ref([
+  {
+    label: 'Удалить',
+    icon: PrimeIcons.TRASH,
+    command: async () => {
+      await journalStore.deleteLesson(selectedLesson.value);
+      toast.add({
+        severity: 'success',
+        life: 3000,
+        summary: 'Успешно!',
+        detail: 'Урок удалён'
+      })
+    }
+  }
+]);
+const selectedLesson = ref();
+
+const onLessonRightClick = (event: Event, lessonId: number) => {
+  selectedLesson.value = lessonId;
+  lessonMenu.value.show(event);
+};
 
 onMounted(async () => {
   if (typeof route.params.id !== 'string') return;
@@ -91,13 +117,13 @@ onMounted(async () => {
   }
 });
 
-function formatLessonName(name: string) {
-  const date = new Date(name);
-  const formatedName = date.toLocaleString('ru-RU', {
-    dateStyle: 'short'
-  });
-  if (formatedName === 'Invalid Date') return name;
-  return formatedName;
+function formatLessonName(lessonName: string): string {
+  const datePattern: RegExp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+  const dateMatch: RegExpMatchArray | null = lessonName.match(datePattern);
+  if (dateMatch) {
+    return new Date(lessonName).toLocaleDateString();
+  }
+  return lessonName;
 }
 
 function getGrade(studentId: number | undefined, lesson: Lesson) {

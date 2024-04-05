@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   UsePipes,
@@ -20,12 +22,18 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @UsePipes(new ValidationPipe())
   async create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+    return await this.usersService.create(dto);
   }
 
   @Get()
   @Roles(UserRole.ADMIN)
   async findAll(@Query('role') role?: UserRole) {
-    return this.usersService.findAll(role);
+    return await this.usersService.findAll(role);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  async delete(@Param('id') id: string) {
+    return await this.usersService.delete(+id);
   }
 }

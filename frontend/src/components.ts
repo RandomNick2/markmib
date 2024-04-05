@@ -15,6 +15,7 @@ import Calendar from 'primevue/calendar';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import Tooltip from 'primevue/tooltip';
+import ContextMenu from 'primevue/contextmenu';
 
 import type { App } from 'vue';
 
@@ -24,7 +25,7 @@ export function registerComponentsPrimeVue(app: App) {
   });
   app.use(ToastService);
   app.directive('ripple', Ripple);
-  app.directive('tooltip', Tooltip)
+  app.directive('tooltip', Tooltip);
   app.component('Menubar', Menubar);
   app.component('InputText', InputText);
   app.component('Button', Button);
@@ -36,4 +37,5 @@ export function registerComponentsPrimeVue(app: App) {
   app.component('Calendar', Calendar);
   app.component('Dialog', Dialog);
   app.component('Dropdown', Dropdown);
+  app.component('ContextMenu', ContextMenu);
 }

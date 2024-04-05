@@ -32,4 +32,10 @@ export class UsersService {
       data: dto,
     });
   }
+
+  async delete(id: number) {
+    return this.prismaService.user.delete({
+      where: { id: id },
+    });
+  }
 }

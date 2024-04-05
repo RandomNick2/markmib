@@ -19,4 +19,9 @@ export default class LessonApi {
 
     return response.data;
   }
+
+  static async delete(lessonId: number) {
+    const response = await $authHost.delete('/lessons/' + lessonId);
+    return response.data;
+  }
 }

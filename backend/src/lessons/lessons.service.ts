@@ -8,7 +8,7 @@ export class LessonsService {
   constructor(private prismaService: PrismaClient) {}
 
   async create(dto: CreateLessonDto) {
-    return this.prismaService.lesson.create({
+    return await this.prismaService.lesson.create({
       data: {
         type: dto.type,
         journalId: dto.journalId,
@@ -22,7 +22,7 @@ export class LessonsService {
 
   async update(user: User, dto: UpdateLessonDto, id: number) {
     // eslint-disable-next-line
-    return this.prismaService.lesson.update({
+    return await this.prismaService.lesson.update({
       where: {
         id: id,
         journal: {
@@ -30,6 +30,14 @@ export class LessonsService {
         },
       },
       data: dto,
+    });
+  }
+
+  async delete(id: number) {
+    return await this.prismaService.lesson.delete({
+      where: {
+        id: id,
+      },
     });
   }
 }
