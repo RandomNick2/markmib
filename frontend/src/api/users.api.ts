@@ -34,6 +34,13 @@ export default class UserApi {
 
   static async delete(id: number) {
     const response = await $authHost.delete('/users/' + id);
-    return response.data
+    return response.data;
+  }
+
+  static async changePassword(id: number, newPassword: string) {
+    const response = await $authHost.patch('/users/' + id, {
+      newPassword: newPassword
+    });
+    return response;
   }
 }

@@ -15,6 +15,7 @@ html {
   background: $bg-color;
   color: #000f2d;
   overflow-x: hidden;
+  --scrollbar-width: 0px !important;
 }
 
 #app {

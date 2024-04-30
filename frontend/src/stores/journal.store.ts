@@ -49,16 +49,18 @@ export const useJournalStore = defineStore({
     ) {
       const response = await GradeApi.updateOrCreate(journalId, studentId, lessonId, value);
       this.journal?.lessons?.map((lesson) => {
-        if (!response.created && lesson.id === response.grade.lessonId) {
+        if (response.created) {
+          lesson.grades.push(response.grade);
+        }
+
+        else if (!response.created && lesson.id === response.grade.lessonId) {
           lesson.grades.map((grade) => {
-            console.log(grade.id, response.grade.id);
             if (grade.id == response.grade.id) {
               grade.value = response.grade.value;
               return;
             }
           });
         }
-        lesson.grades.push(response.grade);
       });
     },
 
@@ -75,10 +77,9 @@ export const useJournalStore = defineStore({
       await LessonApi.delete(lessonId);
       if (this.journal?.lessons != undefined) {
         this.journal.lessons = this.journal?.lessons?.filter(({ id }) => {
-          return id != lessonId
-        })
-      };
-
+          return id != lessonId;
+        });
+      }
     }
   }
 });

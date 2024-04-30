@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateGradeDto {
   @IsNotEmpty()
@@ -13,7 +13,7 @@ export class CreateGradeDto {
   @IsNumber()
   lessonId: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   value: string;
 }

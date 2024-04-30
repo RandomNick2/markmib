@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaClient, UserRole } from '@prisma/client';
 import { genSalt, hash } from 'bcrypt';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
@@ -36,6 +37,19 @@ export class UsersService {
   async delete(id: number) {
     return this.prismaService.user.delete({
       where: { id: id },
+    });
+  }
+
+  async changePassword(id: number, dto: ChangePasswordDto) {
+    const salt = await genSalt(10);
+    const newPassword = await hash(dto.newPassword, salt);
+    await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        password: newPassword,
+      },
     });
   }
 }

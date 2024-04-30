@@ -19,6 +19,9 @@
           <tbody>
             <tr v-for="student in groupStore.group.students" :key="student.id">
               <td>{{ student.firstName }} {{ student.lastName }}</td>
+              <td>
+                <EditUserModal v-model:userId="student.id" />
+              </td>
             </tr>
           </tbody>
         </table>
@@ -92,6 +95,7 @@ import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import EditUserModal from './EditUserModal.vue';
 
 const groupStore = useGroupStore();
 const userStore = useUserStore();

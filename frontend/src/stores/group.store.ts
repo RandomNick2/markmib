@@ -30,6 +30,6 @@ export const useGroupStore = defineStore({
       const group = await GroupApi.create(name);
       this.groups.push(group);
       return group;
-    }
+    },
   }
 });
