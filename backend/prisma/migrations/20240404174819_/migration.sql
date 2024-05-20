@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Grade" ALTER COLUMN "value" SET DATA TYPE TEXT;
