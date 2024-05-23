@@ -5,6 +5,8 @@
       <table class="w-full">
         <thead>
           <th>Название</th>
+          <th>Специальность</th>
+          <th>Квалификация</th>
           <th class="text-right w-0 pl-0" v-if="userStore.role == UserRole.ADMIN">
             <Button
               class="text-white"
@@ -19,6 +21,8 @@
         <tbody>
           <tr v-for="group in groupStore.groups" :key="group.id">
             <td>{{ group.name }}</td>
+            <td>{{ group.speciality.name }}</td>
+            <td>{{ group.qualification.name }}</td>
             <td class="text-right">
               <Button
                 class="text-center"
@@ -42,7 +46,27 @@
   >
     <div class="flex flex-col gap-3 mb-3">
       <label class="font-semibold w-6rem">Название</label>
-      <InputText v-model="groupName" class="flex-auto" autocomplete="off" placeholder="ПОБ-11" />
+      <InputText v-model="state.groupName" class="flex-auto" autocomplete="off" placeholder="ПОБ-11" />
+
+      <label class="font-semibold w-6rem">Специальность</label>
+      <Dropdown
+        v-model="state.groupSpecialityId"
+        :options="groupStore.speciality"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Выберите специальность"
+        class="w-full md:w-20rem"
+      />
+
+      <label class="font-semibold w-6rem">Квалификация</label>
+      <Dropdown
+        v-model="state.groupQualificationId"
+        :options="groupStore.qualification"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Выберите квалицификацию"
+        class="w-full md:w-20rem"
+      />
     </div>
     <Button
       type="button"
@@ -61,7 +85,7 @@ import { useGroupStore } from '@/stores/group.store';
 import { useUserStore } from '@/stores/user.store';
 import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { UserRole } from '@/types/user';
 
 const toast = useToast();
@@ -69,18 +93,27 @@ const groupStore = useGroupStore();
 const userStore = useUserStore();
 
 const isVisibleCreateGroup = ref(false);
-const groupName = ref('');
+const state = reactive({
+  groupName: '',
+  groupSpecialityId: '',
+  groupQualificationId: ''
+});
 const isLoading = ref(false);
+
 
 onMounted(async () => {
   await groupStore.findAll();
+  await groupStore.findSpeciality();
+  await groupStore.findQualification();
 });
 
 async function createGroup() {
   try {
     isLoading.value = true;
-    await groupStore.create(groupName.value);
-    groupName.value = '';
+    await groupStore.create(state.groupName, +state.groupQualificationId, +state.groupSpecialityId);
+    state.groupName = '';
+    state.groupQualificationId = '';
+    state.groupSpecialityId = '';
     isLoading.value = false;
     toast.add({
       summary: 'Успешно!',
@@ -89,6 +122,7 @@ async function createGroup() {
       severity: 'success'
     });
   } catch (e) {
+    console.log(e)
     toast.add({
       summary: 'Ошибка!',
       life: 3000,

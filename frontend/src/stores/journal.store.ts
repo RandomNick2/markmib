@@ -49,8 +49,9 @@ export const useJournalStore = defineStore({
     ) {
       const response = await GradeApi.updateOrCreate(journalId, studentId, lessonId, value);
       this.journal?.lessons?.map((lesson) => {
-        if (response.created) {
+        if (response.created && lesson.id === response.grade.lessonId) {
           lesson.grades.push(response.grade);
+          return;
         }
 
         else if (!response.created && lesson.id === response.grade.lessonId) {
@@ -64,8 +65,8 @@ export const useJournalStore = defineStore({
       });
     },
 
-    async updateLessonName(lessonId: number, name: string) {
-      const updatedLesson = await LessonApi.update(lessonId, LessonType.DEFAULT, name);
+    async updateLesson(lessonId: number, name: string, type: LessonType) {
+      const updatedLesson = await LessonApi.update(lessonId, type, name);
       this.journal?.lessons?.map((lesson) => {
         if (lesson.id === lessonId) {
           lesson.name = updatedLesson.name;
@@ -80,6 +81,6 @@ export const useJournalStore = defineStore({
           return id != lessonId;
         });
       }
-    }
+    },
   }
 });

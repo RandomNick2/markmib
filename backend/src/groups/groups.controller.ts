@@ -16,6 +16,16 @@ import { GroupsService } from './groups.service';
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
+  @Get('speciality')
+  async findSpeciality() {
+    return this.groupsService.findSpeciality();
+  }
+
+  @Get('qualification')
+  async findQualification() {
+    return this.groupsService.findQualification();
+  }
+
   @Get()
   @Roles(UserRole.ADMIN)
   async findAll() {

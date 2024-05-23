@@ -20,11 +20,12 @@ enum UserRole {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  username  String @unique
+  id        Int     @id @default(autoincrement())
+  username  String  @unique
   password  String
   firstName String
   lastName  String
+  avatar    String?
 
   role            UserRole  @default(STUDENT)
   teacherJournals Journal[] @relation("JournalsAsTeacher")
@@ -42,7 +43,7 @@ model Journal {
   teacher   User?  @relation("JournalsAsTeacher", fields: [teacherId], references: [id])
   teacherId Int?
 
-  group   Group @relation(fields: [groupId], references: [id])
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   groupId Int
 
   grades    Grade[]
@@ -54,6 +55,8 @@ model Journal {
 enum LessonType {
   DEFAULT
   RO
+  EXAM
+  FINAL
 }
 
 model Lesson {
@@ -61,7 +64,7 @@ model Lesson {
   type      LessonType @default(DEFAULT)
   name      String
   grades    Grade[]
-  journal   Journal    @relation(fields: [journalId], references: [id])
+  journal   Journal    @relation(fields: [journalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   journalId Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now()) @updatedAt
@@ -76,15 +79,31 @@ model Grade {
   value     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  lesson    Lesson?  @relation(fields: [lessonId], references: [id])
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   lessonId  Int?
 }
 
 model Group {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  journals  Journal[]
-  students  User[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
+  speciality      Speciality     @relation(fields: [specialityId], references: [id])
+  qualification   Qualification @relation(fields: [qualificationId], references: [id])
+  journals        Journal[]
+  students        User[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  specialityId     Int
+  qualificationId Int
+}
+
+model Qualification {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  Group Group[]
+}
+
+model Speciality {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  Group Group[]
 }

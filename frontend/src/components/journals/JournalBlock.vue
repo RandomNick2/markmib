@@ -19,7 +19,7 @@
               type="text"
               :value="formatLessonName(lesson.name)"
               :readonly="userStore.role == UserRole.STUDENT"
-              @change="updateLessonName(lesson.id, $event)"
+              @change="updateLesson(lesson.id, $event)"
             />
           </th>
           <th class="text-right max-w-20 pl-0" v-if="userStore.role != UserRole.STUDENT">
@@ -33,7 +33,10 @@
           </th>
         </thead>
         <tbody v-if="userStore.role != UserRole.STUDENT">
-          <tr v-for="student in journalStore.journal?.group.students" :key="student.id">
+          <tr
+            v-for="student in journalStore.journal?.group.students"
+            :key="student.id"
+          >
             <td class="w-60">{{ student.firstName }} {{ student.lastName }}</td>
             <td
               v-for="lesson in journalStore.journal?.lessons"
@@ -72,13 +75,12 @@
 <script setup lang="ts">
 import { useJournalStore } from '@/stores/journal.store';
 import { useUserStore } from '@/stores/user.store';
-import { LessonType, type Lesson } from '@/types/lesson';
+import { LessonType, LessonTypeLocalize, type Lesson } from '@/types/lesson';
 import { UserRole } from '@/types/user';
 import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import './journal.scss';
 
 const journalStore = useJournalStore();
 const userStore = useUserStore();
@@ -91,15 +93,22 @@ const lessonMenuItems = ref([
   {
     label: 'Удалить',
     icon: PrimeIcons.TRASH,
-    command: async () => {
-      await journalStore.deleteLesson(selectedLesson.value);
-      toast.add({
-        severity: 'success',
-        life: 3000,
-        summary: 'Успешно!',
-        detail: 'Урок удалён'
-      })
-    }
+    command: deleteLesson
+  },
+  {
+    label: LessonTypeLocalize[LessonType.RO],
+    command: changeLessonType,
+    type: LessonType.RO
+  },
+  {
+    label: LessonTypeLocalize[LessonType.EXAM],
+    command: changeLessonType,
+    type: LessonType.EXAM
+  },
+  {
+    label: LessonTypeLocalize[LessonType.FINAL],
+    command: changeLessonType,
+    type: LessonType.FINAL
   }
 ]);
 const selectedLesson = ref();
@@ -130,6 +139,33 @@ function getGrade(studentId: number | undefined, lesson: Lesson) {
   // Получаем оценку для данного пользователя и даты урока
   const grade = lesson.grades.find((g) => g.studentId === studentId);
   return grade?.value;
+}
+
+async function changeLessonType(e: Event) {
+  // @ts-ignore
+  const type = e.item.type as LessonType;
+
+  await journalStore.updateLesson(selectedLesson.value, LessonTypeLocalize[type], type);
+  toast.add({
+    severity: 'success',
+    life: 3000,
+    summary: 'Успешно!'
+  });
+
+  if (type == LessonType.FINAL) {
+    // @ts-ignore
+    await journalStore.findOne(route.params.id);
+  }
+}
+
+async function deleteLesson() {
+  await journalStore.deleteLesson(selectedLesson.value);
+  toast.add({
+    severity: 'success',
+    life: 3000,
+    summary: 'Успешно!',
+    detail: 'Урок удалён'
+  });
 }
 
 async function createLesson() {
@@ -174,12 +210,12 @@ async function updateOrCreateGrade(studentId: number, lessonId: number, event: E
   }
 }
 
-async function updateLessonName(lessonId: number, event: Event) {
+async function updateLesson(lessonId: number, event: Event) {
   const input = event.target as HTMLInputElement;
   const name = input.value;
 
   try {
-    await journalStore.updateLessonName(lessonId, name);
+    await journalStore.updateLesson(lessonId, name, LessonType.DEFAULT);
     toast.add({
       severity: 'success',
       summary: 'Успешно!',
@@ -195,3 +231,10 @@ async function updateLessonName(lessonId: number, event: Event) {
   }
 }
 </script>
+
+<style scoped>
+td,
+th {
+  padding-left: 0 !important;
+}
+</style>

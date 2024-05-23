@@ -32,6 +32,7 @@ export class JournalsService {
                 },
               },
               name: true,
+              type: true,
             },
           },
           group: {

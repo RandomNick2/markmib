@@ -5,6 +5,7 @@
       <div class="table-wrapper mt-4">
         <table class="w-full">
           <thead>
+            <th>Аватар</th>
             <th>ФИО</th>
             <th class="text-right w-0 pl-0">
               <Button
@@ -18,6 +19,9 @@
           </thead>
           <tbody>
             <tr v-for="student in groupStore.group.students" :key="student.id">
+              <td>
+                <Avatar :image="student.avatar" size="large" shape="circle" />
+              </td>
               <td>{{ student.firstName }} {{ student.lastName }}</td>
               <td>
                 <EditUserModal v-model:userId="student.id" />
@@ -35,6 +39,19 @@
     header="Добавить студента"
     :style="{ width: '25rem' }"
   >
+    <div class="flex flex-col gap-3 mb-3">
+      <label class="font-semibold w-6rem">Аватар</label>
+
+      <FileUpload
+        mode="basic"
+        name="demo[]"
+        accept="image/*"
+        :auto="true"
+        customUpload
+        @uploader="customBase64Uploader"
+      />
+    </div>
+
     <div class="flex flex-col gap-3 mb-3">
       <label class="font-semibold w-6rem">Логин</label>
       <InputText
@@ -87,13 +104,14 @@
 </template>
 
 <script setup lang="ts">
+import Avatar from 'primevue/avatar';
+import FileUpload from 'primevue/fileupload';
 import { useGroupStore } from '@/stores/group.store';
 import { useUserStore } from '@/stores/user.store';
-import type { User } from '@/types/user';
 import { UserRole } from '@/types/user';
 import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import EditUserModal from './EditUserModal.vue';
 
@@ -104,11 +122,12 @@ const toast = useToast();
 
 const isVisibleCreateStudent = ref(false);
 const isLoading = ref(false);
-const userData = ref({
-  username: undefined,
-  password: undefined,
-  firstName: undefined,
-  lastName: undefined,
+const userData = reactive({
+  username: '',
+  password: '',
+  avatar: '',
+  firstName: '',
+  lastName: '',
   groupId: +route.params.id,
   role: UserRole.STUDENT
 });
@@ -118,10 +137,19 @@ onMounted(async () => {
   await groupStore.findOne(+route.params.id);
 });
 
+function customBase64Uploader(file: any) {
+  var reader = new FileReader();
+  reader.onloadend = () => {
+    // @ts-ignore
+    userData.avatar = reader.result;
+    console.log(userData.avatar);
+  };
+  reader.readAsDataURL(file.files[0]);
+}
+
 async function createStudent() {
   try {
-    const data = userData.value as User;
-    const student = await userStore.create(data);
+    const student = await userStore.create(userData);
     groupStore.group?.students.push(student);
     toast.add({
       severity: 'success',

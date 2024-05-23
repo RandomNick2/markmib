@@ -17,7 +17,7 @@ export default class UserApi {
     return response.data;
   }
 
-  static async create(user: User) {
+  static async create(user: object) {
     const response = await $authHost.post('/users', user);
     return response.data;
   }

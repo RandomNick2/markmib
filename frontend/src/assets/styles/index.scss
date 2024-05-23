@@ -105,6 +105,10 @@ html {
     td {
       @apply h-10;
 
+      &:not(:last-child) {
+        @apply pl-4;
+      }
+
       border-right: 1px solid #ebeef6;
 
       &:first-child {

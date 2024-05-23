@@ -1,6 +1,6 @@
-import UserApi from '@/api/users.api'
-import type { User, UserRole } from '@/types/user'
-import { defineStore } from 'pinia'
+import UserApi from '@/api/users.api';
+import type { User, UserRole } from '@/types/user';
+import { defineStore } from 'pinia';
 
 export interface UserState extends User {
   isLogged: boolean;
@@ -17,7 +17,8 @@ export const useUserStore = defineStore({
 
   state: (): UserState => ({
     isLogged: !!localStorage.getItem('token'),
-    users: []
+    users: [],
+    id: 1
   }),
 
   actions: {
@@ -50,7 +51,7 @@ export const useUserStore = defineStore({
       this.$reset();
     },
 
-    async create(data: User) {
+    async create(data: object) {
       const response = await UserApi.create(data);
       this.users.push(response);
       return response;
@@ -64,8 +65,8 @@ export const useUserStore = defineStore({
     async deleteUser(userId: number) {
       await UserApi.delete(userId);
       this.users = this.users.filter(({ id }) => {
-        return id != userId
-      })
+        return id != userId;
+      });
     }
   }
 });

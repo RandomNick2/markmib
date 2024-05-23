@@ -1,5 +1,6 @@
 import type { Journal } from '@/types/journal'
 import { $authHost } from '.';
+import type { LessonType } from '@/types/lesson'
 
 export default class JournalsApi {
   static async findAll() {

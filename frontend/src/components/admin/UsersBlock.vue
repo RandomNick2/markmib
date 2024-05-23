@@ -43,6 +43,7 @@
     header="Создать пользователя"
     :style="{ width: '25rem' }"
   >
+
     <div class="flex flex-col gap-3 mb-3">
       <label class="font-semibold w-6rem">Логин</label>
       <InputText
@@ -111,6 +112,7 @@ import { UserRole } from '@/types/user';
 import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref } from 'vue';
+import FileUpload from 'primevue/fileupload';
 
 const userStore = useUserStore();
 const toast = useToast();

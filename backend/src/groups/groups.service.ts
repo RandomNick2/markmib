@@ -10,6 +10,8 @@ export class GroupsService {
     return this.prismaService.group.findMany({
       include: {
         students: true,
+        speciality: true,
+        qualification: true,
       },
       orderBy: {
         id: 'desc',
@@ -23,6 +25,8 @@ export class GroupsService {
         where: { id: id },
         include: {
           students: true,
+          speciality: true,
+          qualification: true,
         },
       });
     } catch (e) {
@@ -33,6 +37,18 @@ export class GroupsService {
   async create(dto: CreateGroupDto) {
     return this.prismaService.group.create({
       data: dto,
+      include: {
+        speciality: true,
+        qualification: true,
+      },
     });
+  }
+
+  async findSpeciality() {
+    return this.prismaService.speciality.findMany();
+  }
+
+  async findQualification() {
+    return this.prismaService.qualification.findMany();
   }
 }
