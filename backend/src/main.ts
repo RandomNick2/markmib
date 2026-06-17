@@ -6,7 +6,7 @@ async function bootstrap() {
   app.useGlobalInterceptors();
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:52',
     credentials: true,
   });
   await app.listen(3000);
