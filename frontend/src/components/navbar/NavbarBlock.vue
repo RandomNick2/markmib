@@ -1,111 +1,99 @@
-<script lang="ts" setup>
-import { UserRole } from '@/types/user';
-import './navbar.scss';
-</script>
-
-<template>
-  <Menubar :model="items">
-    <template #start>
-      <RouterLink class="font-bold" :to="{ name: 'home' }"> MarKmib </RouterLink>
-    </template>
-    <template #item="{ item, props, hasSubmenu, root }">
-      <RouterLink
-        v-ripple
-        class="flex items-center bg-secondary"
-        :to="{ name: item.routeName }"
-        v-if="!item.role || user.role === item.role || user.role === UserRole.ADMIN"
-        v-bind="props.action"
-      >
-        <span :class="item.icon" />
-        <span class="ml-2">{{ item.label }}</span>
-        <Badge v-if="item.badge" :class="{ 'ml-auto': !root, 'ml-2': root }" :value="item.badge" />
-        <span
-          v-if="item.shortcut"
-          class="ml-auto border border-surface-200 dark:border-surface-500 rounded-md bg-surface-100 dark:bg-surface-800 text-xs p-1"
-          >{{ item.shortcut }}</span
-        >
-        <i
-          v-if="hasSubmenu"
-          :class="[
-            'pi pi-angle-down text-primary-500 dark:text-primary-400-500 dark:text-primary-400',
-            { 'pi-angle-down ml-2': root, 'pi-angle-right ml-auto': !root }
-          ]"
-        ></i>
-      </RouterLink>
-    </template>
-    <template #end>
-      <RouterLink :to="{ name: 'auth' }" v-if="!user.isLogged">
-        <Button label="Войти" severity="info" />
-      </RouterLink>
-
-      <div class="flex align-items-center gap-2" v-else>
-        <SplitButton
-          v-ripple
-          icon="pi pi-user"
-          :model="profileButton"
-          id="user_dropdown"
-          :label="user.username"
-        >
-          <template #default>
-            <span class="p-button-label ml-2" data-pc-section="label">{{ user.firstName }}</span>
-          </template>
-        </SplitButton>
-      </div>
-    </template>
-  </Menubar>
-</template>
-
-<script lang="ts">
-import type { UserStore } from '@/stores/user.store';
+<script setup lang="ts">
 import { useUserStore } from '@/stores/user.store';
+import { UserRole } from '@/types/user';
 import { PrimeIcons } from 'primevue/api';
 import type { MenuItem } from 'primevue/menuitem';
-import { defineComponent } from 'vue';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import './navbar.scss';
 
-interface MenuItemCustom extends MenuItem {
+interface NavItem extends MenuItem {
+  routeName: string;
   role?: UserRole;
 }
 
-export default defineComponent({
-  data() {
-    const userStore = useUserStore();
+const userStore = useUserStore();
+const router = useRouter();
 
-    return {
-      items: [
-        {
-          label: 'Журналы',
-          icon: PrimeIcons.BOOK,
-          routeName: 'journals'
-        },
-        {
-          label: 'Группы',
-          icon: PrimeIcons.USERS,
-          routeName: 'groups',
-          role: UserRole.ADMIN
-        },
-        {
-          label: 'Пользователи',
-          icon: PrimeIcons.USERS,
-          routeName: 'users',
-          role: UserRole.ADMIN
-        }
-      ],
-      profileButton: [
-        {
-          label: 'Выйти',
-          icon: PrimeIcons.SIGN_OUT,
-          command: this.logout
-        }
-      ] as MenuItemCustom[],
-      user: userStore as UserStore
-    };
+const items = computed<NavItem[]>(() => [
+  {
+    label: 'Журналы',
+    icon: PrimeIcons.BOOK,
+    routeName: 'journals'
   },
-
-  methods: {
-    logout() {
-      this.user.logout();
-      this.$router.push({ name: 'auth' });
-    }
+  {
+    label: 'Группы',
+    icon: PrimeIcons.USERS,
+    routeName: 'groups',
+    role: UserRole.ADMIN
+  },
+  {
+    label: 'Пользователи',
+    icon: PrimeIcons.ID_CARD,
+    routeName: 'users',
+    role: UserRole.ADMIN
   }
-});
+]);
+
+const visibleItems = computed(() =>
+  items.value.filter((item) => !item.role || userStore.role === item.role || userStore.role === UserRole.ADMIN)
+);
+
+const profileButton = computed<MenuItem[]>(() => [
+  {
+    label: 'Выйти',
+    icon: PrimeIcons.SIGN_OUT,
+    command: logout
+  }
+]);
+
+function logout() {
+  userStore.logout();
+  router.push({ name: 'auth' });
+}
 </script>
+
+<template>
+  <header class="nav-shell">
+    <div class="wrapper">
+      <Menubar :model="visibleItems" class="nav-shell__bar">
+        <template #start>
+          <RouterLink class="nav-shell__brand" :to="{ name: 'home' }">
+            <span class="nav-shell__brand-mark">M</span>
+            <span>MarKmib</span>
+          </RouterLink>
+        </template>
+
+        <template #item="{ item, props }">
+          <RouterLink class="nav-shell__item" :to="{ name: item.routeName }" v-bind="props.action">
+            <span :class="item.icon" />
+            <span>{{ item.label }}</span>
+          </RouterLink>
+        </template>
+
+        <template #end>
+          <RouterLink :to="{ name: 'auth' }" v-if="!userStore.isLogged">
+            <Button label="Войти" severity="contrast" />
+          </RouterLink>
+
+          <div class="nav-shell__profile" v-else>
+            <div class="nav-shell__profile-copy">
+              <span class="nav-shell__profile-name">
+                {{ userStore.firstName || userStore.username }}
+              </span>
+              <span class="nav-shell__profile-role">{{ userStore.role }}</span>
+            </div>
+
+            <SplitButton icon="pi pi-user" :model="profileButton" severity="contrast">
+              <template #default>
+                <span class="p-button-label ml-2 pr-2" data-pc-section="label">
+                  {{ userStore.username || 'Профиль' }}
+                </span>
+              </template>
+            </SplitButton>
+          </div>
+        </template>
+      </Menubar>
+    </div>
+  </header>
+</template>

@@ -78,9 +78,14 @@ import { useUserStore } from '@/stores/user.store';
 import { LessonType, LessonTypeLocalize, type Lesson } from '@/types/lesson';
 import { UserRole } from '@/types/user';
 import { PrimeIcons } from 'primevue/api';
+import type { MenuItem, MenuItemCommandEvent } from 'primevue/menuitem';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+
+interface LessonMenuItem extends MenuItem {
+  type?: LessonType;
+}
 
 const journalStore = useJournalStore();
 const userStore = useUserStore();
@@ -89,7 +94,7 @@ const toast = useToast();
 
 const student = ref();
 const lessonMenu = ref();
-const lessonMenuItems = ref([
+const lessonMenuItems = ref<LessonMenuItem[]>([
   {
     label: 'Удалить',
     icon: PrimeIcons.TRASH,
@@ -141,9 +146,9 @@ function getGrade(studentId: number | undefined, lesson: Lesson) {
   return grade?.value;
 }
 
-async function changeLessonType(e: Event) {
-  // @ts-ignore
-  const type = e.item.type as LessonType;
+async function changeLessonType(e: MenuItemCommandEvent) {
+  const type = (e.item as LessonMenuItem).type;
+  if (!type) return;
 
   await journalStore.updateLesson(selectedLesson.value, LessonTypeLocalize[type], type);
   toast.add({
@@ -153,8 +158,7 @@ async function changeLessonType(e: Event) {
   });
 
   if (type == LessonType.FINAL) {
-    // @ts-ignore
-    await journalStore.findOne(route.params.id);
+    await journalStore.findOne(String(route.params.id));
   }
 }
 

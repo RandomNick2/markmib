@@ -11,7 +11,7 @@
           <th class="text-center">Роль</th>
           <th class="w-0">
             <Button
-              class="text-white"
+              class="user-create-button"
               :icon="PrimeIcons.PLUS"
               v-ripple
               v-tooltip.bottom="'Создать пользователя'"
@@ -70,7 +70,7 @@
         v-model="userData.firstName"
         class="flex-auto"
         autocomplete="off"
-        placeholder="Бакберген"
+        placeholder="Имя"
       />
     </div>
 
@@ -80,7 +80,7 @@
         v-model="userData.lastName"
         class="flex-auto"
         autocomplete="off"
-        placeholder="Нурлыбек"
+        placeholder="Фамилия"
       />
     </div>
 
@@ -179,3 +179,16 @@ async function createUser() {
   isLoading.value = false;
 }
 </script>
+
+<style scoped lang="scss">
+.user-create-button {
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.18);
+}
+
+.user-create-button :deep(.pi) {
+  color: #ffffff;
+}
+</style>

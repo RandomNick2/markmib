@@ -78,7 +78,7 @@
         v-model="userData.firstName"
         class="flex-auto"
         autocomplete="off"
-        placeholder="Бакберген"
+        placeholder="Имя"
       />
     </div>
 
@@ -88,7 +88,7 @@
         v-model="userData.lastName"
         class="flex-auto"
         autocomplete="off"
-        placeholder="Нурлыбек"
+        placeholder="Фамилия"
       />
     </div>
     <Button

@@ -38,7 +38,7 @@ export const useJournalStore = defineStore({
     async createLesson(journalId: number, type?: LessonType, name?: string) {
       const lesson = await LessonApi.create(journalId, type, name);
       if (!this.journal?.lessons) return;
-      this.journal?.lessons.push(lesson);
+      this.journal.lessons.push(lesson);
     },
 
     async createOrUpdateGrade(
@@ -48,39 +48,40 @@ export const useJournalStore = defineStore({
       value: string
     ) {
       const response = await GradeApi.updateOrCreate(journalId, studentId, lessonId, value);
-      this.journal?.lessons?.map((lesson) => {
-        if (response.created && lesson.id === response.grade.lessonId) {
+
+      this.journal?.lessons?.forEach((lesson) => {
+        if (lesson.id !== response.grade.lessonId) return;
+
+        if (response.created) {
           lesson.grades.push(response.grade);
           return;
         }
 
-        else if (!response.created && lesson.id === response.grade.lessonId) {
-          lesson.grades.map((grade) => {
-            if (grade.id == response.grade.id) {
-              grade.value = response.grade.value;
-              return;
-            }
-          });
-        }
+        lesson.grades.forEach((grade) => {
+          if (grade.id === response.grade.id) {
+            grade.value = response.grade.value;
+          }
+        });
       });
     },
 
     async updateLesson(lessonId: number, name: string, type: LessonType) {
       const updatedLesson = await LessonApi.update(lessonId, type, name);
-      this.journal?.lessons?.map((lesson) => {
+
+      this.journal?.lessons?.forEach((lesson) => {
         if (lesson.id === lessonId) {
           lesson.name = updatedLesson.name;
+          lesson.type = updatedLesson.type;
         }
       });
     },
 
     async deleteLesson(lessonId: number) {
       await LessonApi.delete(lessonId);
-      if (this.journal?.lessons != undefined) {
-        this.journal.lessons = this.journal?.lessons?.filter(({ id }) => {
-          return id != lessonId;
-        });
+
+      if (this.journal?.lessons) {
+        this.journal.lessons = this.journal.lessons.filter(({ id }) => id !== lessonId);
       }
-    },
+    }
   }
 });

@@ -1,7 +1,6 @@
 import { useUserStore } from '@/stores/user.store';
 import { UserRole } from '@/types/user';
 import { createRouter, createWebHistory } from 'vue-router';
-// import HomeView from '../views/HomeView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,9 +8,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      // component: HomeView,
       redirect: '/journals'
-      // meta: { auth: false }
     },
     {
       path: '/auth',
@@ -19,12 +16,6 @@ const router = createRouter({
       component: () => import('../views/AuthView.vue'),
       meta: { auth: false }
     },
-    // {
-    // path: '/profile',
-    // name: 'profile',
-    // component: () => import('../views/ProfileView.vue'),
-    // meta: { auth: true }
-    // },
     {
       path: '/journals',
       name: 'journals',
@@ -58,24 +49,29 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to) => {
   const user = useUserStore();
-  user.loadUser().then(function () {
-    //  Проверка на роль
-    const requireRole = to.meta.role;
 
-    if (requireRole && user.role == UserRole.ADMIN) return next();
+  if (!user.hydrated) {
+    await user.loadUser();
+  }
 
-    if (requireRole && user.role !== requireRole) {
-      return next('/journals');
-    }
+  const requireAuth = to.matched.some((record) => record.meta.auth);
+  const requireRole = to.meta.role as UserRole | undefined;
 
-    //  Проверка на авторизацию
-    const requireAuth = to.matched.some((record) => record.meta.auth);
-    if (requireAuth && !user.isLogged) return next('/auth');
+  if (requireAuth && !user.isLogged) {
+    return { name: 'auth' };
+  }
 
-    return next();
-  });
+  if (to.name === 'auth' && user.isLogged) {
+    return { name: 'journals' };
+  }
+
+  if (requireRole && user.role !== UserRole.ADMIN && user.role !== requireRole) {
+    return { name: 'journals' };
+  }
+
+  return true;
 });
 
 export default router;

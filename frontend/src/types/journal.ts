@@ -9,4 +9,5 @@ export interface Journal {
   groupId?: number;
   lessons?: Lesson[];
   teacher?: User;
+  teacherId?: number;
 }

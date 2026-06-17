@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: markmib-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: markmib
+      POSTGRES_USER: markmib
+      POSTGRES_PASSWORD: markmib
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U markmib -d markmib"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: markmib-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://markmib:markmib@db:5432/markmib?schema=public
+      JWT_SECRET: markmib-local-secret
+      SUPERUSER_USERNAME: admin
+      SUPERUSER_PASSWORD: admin123
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API: /api
+    container_name: markmib-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:

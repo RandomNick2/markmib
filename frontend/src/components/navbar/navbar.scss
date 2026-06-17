@@ -1,26 +1,95 @@
 @import '@/assets/styles/variables';
 
-.p-menubar {
-  @apply p-4 rounded-none;
+.nav-shell {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 1rem 0 0;
+}
 
-  background-color: $secondary-color !important;
+.nav-shell__bar.p-menubar {
+  padding: 0.9rem 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: $nav-shadow;
+  backdrop-filter: blur(18px);
+}
 
-  &-start > span {
-    @apply text-xl;
-    color: rgb(0, 15, 45, 0.7);
-    font-family: 'Manrope', sans-serif !important;
-  }
+.nav-shell__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-color;
+}
 
-  &-root-list {
-    @apply ml-0 lg:ml-4 gap-2 items-center;
-  }
+.nav-shell__brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+  color: #fff;
+}
 
-  &-button {
-    @apply ml-2;
-  }
+.nav-shell__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  color: rgba(15, 23, 42, 0.75);
+  font-weight: 700;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
 
-  .p-menuitem {
-    @apply rounded-3xl bg-secondary;
-    margin: 0 !important;
+.nav-shell__item:hover {
+  background: rgba(15, 118, 110, 0.08);
+  color: $text-color;
+  transform: translateY(-1px);
+}
+
+.nav-shell__profile {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.nav-shell__profile-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.nav-shell__profile-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: $text-color;
+}
+
+.nav-shell__profile-role {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $muted-text-color;
+}
+
+.p-menubar-root-list {
+  gap: 0.25rem;
+}
+
+@media (max-width: 960px) {
+  .nav-shell__profile-copy {
+    display: none;
   }
 }

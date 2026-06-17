@@ -9,7 +9,7 @@
           <th>Квалификация</th>
           <th class="text-right w-0 pl-0" v-if="userStore.role == UserRole.ADMIN">
             <Button
-              class="text-white"
+              class="group-create-button"
               :icon="PrimeIcons.PLUS"
               v-ripple
               v-tooltip.bottom="'Создать группу'"
@@ -131,3 +131,16 @@ async function createGroup() {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.group-create-button {
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.18);
+}
+
+.group-create-button :deep(.pi) {
+  color: #ffffff;
+}
+</style>

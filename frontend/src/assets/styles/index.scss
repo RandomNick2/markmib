@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 @import './variables';
 
 @import 'tailwindcss/base';
@@ -9,142 +9,278 @@
 @tailwind components;
 @tailwind utilities;
 
-body,
-html {
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
   font-family: 'Manrope', sans-serif !important;
-  background: $bg-color;
-  color: #000f2d;
+  background:
+    radial-gradient(circle at top left, $bg-gradient-top, transparent 30%),
+    radial-gradient(circle at bottom right, $bg-gradient-bottom, transparent 28%),
+    $bg-color;
+  color: $text-color;
   overflow-x: hidden;
   --scrollbar-width: 0px !important;
 }
 
-#app {
-  @apply flex flex-col;
-  min-height: 100vh;
+body {
+  min-width: 320px;
+}
 
-  .content {
-    flex: 1;
-  }
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell__glow {
+  position: fixed;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell__glow--left {
+  top: 5rem;
+  left: -8rem;
+  background: rgba(14, 165, 233, 0.22);
+}
+
+.app-shell__glow--right {
+  right: -8rem;
+  bottom: 8rem;
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
 }
 
 .wrapper {
-  @apply flex flex-col px-5 mx-auto sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-7xl 2xl:max-w-screen-xl relative;
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  position: relative;
+}
+
+.page-section {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+
+.page-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-hero__eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: $blue-color;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-hero__title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1;
+  font-weight: 800;
+}
+
+.page-hero__description {
+  max-width: 42rem;
+  margin: 0.8rem 0 0;
+  color: $muted-text-color;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.card-table {
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
+}
+
+.card-table table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.card-table thead {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.card-table th,
+.card-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.card-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.card-table tbody tr:hover {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.card-table__empty {
+  text-align: center;
+  color: $muted-text-color;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-weight: 700;
+  color: $text-color;
+}
+
+.p-inputtext.p-component,
+.p-password,
+.p-dropdown {
+  width: 100%;
+  border-radius: 1rem;
 }
 
 .p-inputtext.p-component {
-  @apply rounded-lg p-2;
+  padding: 0.85rem 1rem;
   background: $input-bg;
   border: $input-border;
-  color: #0c1a36;
+  color: $text-color;
 
   &.p-invalid {
     border: 1px solid $red-color;
   }
 }
 
-.p-inputwrapper {
-  @apply rounded-lg;
+.p-inputwrapper,
+.p-dropdown {
   background: $input-bg;
   border: $input-border;
-  color: #0c1a36;
+  color: $text-color;
 
   &.p-invalid {
     border: 1px solid $red-color;
   }
 }
 
-.p-multiselect {
-  background: $input-bg;
-  border: $input-border;
-  color: #0c1a36;
+.p-button {
+  border-radius: 999px;
 }
 
 .p-button-primary {
-  @apply py-2.5 px-2 bg-primary;
+  padding: 0.85rem 1.2rem;
+  border: none;
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+}
+
+.p-button-secondary,
+.p-button-contrast {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(255, 255, 255, 0.75);
+  color: $text-color;
+}
+
+.p-dialog {
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: $modal-box-shadow;
+}
+
+.p-dialog .p-dialog-header {
+  background: #fff;
 }
 
 .p-tieredmenu {
-  @apply bg-primary shadow-secondary;
-  box-shadow: 0 4px 22px 0 rgba(0, 0, 0, 0.25);
-}
-
-.p-menuitem-content,
-.p-menuitem {
-  @apply rounded bg-primary;
-  border: none;
-  box-shadow: none;
-}
-
-.p-button-blue {
-  background-color: $blue-color;
-  color: $secondary-color;
-}
-
-.p-multiselect-panel {
-  box-shadow: 0 4px 35px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
 }
 
 .table-wrapper {
-  @apply relative border-collapse h-96 rounded-xl;
-  background-color: $secondary-color;
+  @extend .card-table;
   overflow-x: auto;
-  max-width: 100%;
-
-  table {
-    @apply text-left rounded-xl;
-    background-color: $secondary-color;
-    width: max-content;
-    min-width: 100%;
-    border-spacing: 0;
-
-    thead {
-      border-bottom: 1px solid #ebeef6;
-    }
-
-    th,
-    td {
-      @apply h-10;
-
-      &:not(:last-child) {
-        @apply pl-4;
-      }
-
-      border-right: 1px solid #ebeef6;
-
-      &:first-child {
-        @apply text-center;
-      }
-    }
-
-    td {
-      @apply h-14;
-    }
-
-    tr {
-      width: min-content;
-      background-color: $primary-color;
-      border-bottom: 1px solid #ebeef6;
-
-      &:hover,
-      &:focus {
-        background-color: #a4a5a578;
-      }
-    }
-
-    input {
-      @apply h-full bg-transparent outline-none text-center w-full;
-
-      &:focus {
-        background-color: #6d7ab838;
-      }
-    }
-  }
 }
 
-.p-datepicker {
-  @apply bg-secondary;
+.table-wrapper table {
+  min-width: 100%;
+}
+
+.table-wrapper input {
+  width: 100%;
+  height: 100%;
+  min-height: 2.75rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: $text-color;
+}
+
+.table-wrapper input:focus {
+  background: rgba(14, 165, 233, 0.08);
 }
 
 .pi {
-  @apply text-black;
+  color: currentColor;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    width: min(100% - 1rem, 1180px);
+  }
+
+  .page-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card-table {
+    overflow-x: auto;
+  }
 }
