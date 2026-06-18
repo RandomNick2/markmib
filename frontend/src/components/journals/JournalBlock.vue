@@ -24,7 +24,7 @@
           </th>
           <th class="text-right max-w-20 pl-0" v-if="userStore.role != UserRole.STUDENT">
             <Button
-              class="text-white"
+              class="lesson-create-button"
               :icon="PrimeIcons.PLUS"
               v-ripple
               @click="createLesson"
@@ -236,7 +236,18 @@ async function updateLesson(lessonId: number, event: Event) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.lesson-create-button {
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.18);
+}
+
+.lesson-create-button :deep(.pi) {
+  color: #ffffff;
+}
+
 td,
 th {
   padding-left: 0 !important;

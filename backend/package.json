@@ -19,8 +19,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate": "prisma migrate dev",
-    "create:superuser": "ts-node prisma/createsuperuser.ts",
-    "seed": "ts-node prisma/seed.ts"
+    "create:superuser": "node dist/prisma/createsuperuser.js",
+    "create:superuser:dev": "ts-node prisma/createsuperuser.ts",
+    "seed": "node dist/prisma/seed.js",
+    "seed:dev": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
